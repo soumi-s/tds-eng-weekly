@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Engineering Weekly — Oct 22</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f5f3f0; color: #1a1a1a; min-height: 100vh;
+  overflow-x: hidden;
+}
+.page-header { max-width: 960px; margin: 0 auto; padding: 32px 40px 0; }
+.header { margin-bottom: 20px; border-bottom: 3px solid #222; padding-bottom: 14px; }
+.header h1 { font-size: 32px; font-weight: 700; letter-spacing: -1px; }
+.header p { font-size: 17px; color: #888; }
+.filter-bar { max-width: 960px; margin: 0 auto; padding: 0 40px 20px; display: flex; gap: 8px; flex-wrap: wrap; }
+.filter-chip { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; padding: 8px 18px; border: 2px solid transparent; border-radius: 100px; background: #e8e5e0; color: #666; cursor: pointer; transition: all 0.15s ease; user-select: none; }
+.filter-chip:hover { background: #ddd8d2; color: #333; }
+.filter-chip.active { color: #fff; }
+.filter-chip[data-filter="all"].active { background: #1a1a1a; color: #fff; }
+.filter-chip[data-filter="bsc"].active { background: #b91c1c; }
+.filter-chip[data-filter="ts"].active { background: #1d4ed8; }
+.filter-chip[data-filter="ttb"].active { background: #0369a1; }
+.filter-chip[data-filter="go"].active { background: #6d28d9; }
+.filter-chip[data-filter="pm"].active { background: #047857; }
+.board-scroll { width: 100%; overflow-x: auto; padding: 0 40px 40px; -webkit-overflow-scrolling: touch; }
+.board { display: flex; gap: 16px; min-width: min-content; }
+.col { width: 280px; min-width: 280px; flex-shrink: 0; background: #eae7e3; border-radius: 14px; padding: 20px 16px; display: flex; flex-direction: column; }
+.col-head { margin-bottom: 16px; }
+.col-head h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px; }
+.col-count { display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; min-width: 24px; height: 24px; background: rgba(0,0,0,0.08); border-radius: 100px; padding: 0 8px; }
+.col-head p { font-size: 13px; color: #888; margin-top: 4px; line-height: 1.4; }
+.col-cards { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.col-empty { font-size: 14px; color: #aaa; font-style: italic; text-align: center; padding: 24px 12px; }
+.card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: box-shadow 0.15s, transform 0.15s; cursor: pointer; }
+.card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
+.card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.card-brand { font-size: 12px; font-weight: 700; border-radius: 5px; padding: 2px 8px; flex-shrink: 0; }
+.cb-ts { background: #dbeafe; color: #1d4ed8; }
+.cb-bsc { background: #fee2e2; color: #b91c1c; }
+.cb-ttb { background: #e0f2fe; color: #0369a1; }
+.cb-pm { background: #d1fae5; color: #047857; }
+.cb-go { background: #ede9fe; color: #6d28d9; }
+.card-date { font-size: 12px; color: #aaa; margin-left: auto; flex-shrink: 0; font-weight: 500; }
+.card-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.cd-green { background: #16a34a; }
+.cd-orange { background: #ea580c; }
+.cd-yellow { background: #ca8a04; }
+.cd-purple { background: #7c3aed; }
+.cd-blue { background: #2563eb; }
+.cd-red { background: #dc2626; }
+.card-title { font-size: 16px; font-weight: 600; line-height: 1.3; }
+.card-meta { font-size: 13px; color: #888; margin-top: 4px; line-height: 1.4; }
+.card-owner { font-size: 13px; color: #aaa; margin-top: 6px; }
+.card-link { font-size: 12px; color: #6366f1; text-decoration: none; font-weight: 500; cursor: pointer; }
+.card-link:hover { text-decoration: underline; }
+.pipe-card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: box-shadow 0.15s; cursor: pointer; }
+.pipe-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.pipe-card .card-brand { margin-bottom: 8px; display: inline-block; }
+.pipe-title { font-size: 16px; font-weight: 600; line-height: 1.3; }
+.pipe-desc { font-size: 13px; color: #888; margin-top: 4px; line-height: 1.4; }
+.tag-next { display: inline-block; font-size: 11px; font-weight: 700; background: #ede9fe; color: #6d28d9; border-radius: 100px; padding: 2px 10px; vertical-align: middle; }
+.card.hidden, .pipe-card.hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="page-header"><div class="header"><h1>Engineering Weekly</h1><p>October 22, 2026 &middot; Q4 Cycle 1 &middot; Week 4 of 6</p></div></div>
+<div class="filter-bar"><span class="filter-chip active" data-filter="all">All</span><span class="filter-chip" data-filter="bsc">Boston Scally</span><span class="filter-chip" data-filter="ts">Taylor Stitch</span><span class="filter-chip" data-filter="ttb">The Tie Bar</span><span class="filter-chip" data-filter="go">Glade</span><span class="filter-chip" data-filter="pm">Pedal Mafia</span></div>
+<div class="board-scroll"><div class="board">
+<div class="col" data-col="shipped"><div class="col-head"><h2><span class="card-dot cd-green"></span>Shipped <span class="col-count">34</span></h2><p>Completed this cycle (since Sep 28).</p></div><div class="col-cards">
+<div class="card" data-brand="ts" onclick="window.open('https://app.asana.com/0/1216918298689870/1218958449670363','_blank')"><div class="card-top"><span class="card-brand cb-ts">TS</span><span class="card-date">Oct 21</span></div><div class="card-title">Lookbook 2026 Q4</div><div class="card-meta">Q4 lookbook published for Taylor Stitch</div><div class="card-owner">Amanda &middot; <a class="card-link" href="https://app.asana.com/0/1216918298689870/1218958449670363" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+<div class="card" data-brand="go" onclick="window.open('https://app.asana.com/0/1216918298689870/1215976313921293','_blank')"><div class="card-top"><span class="card-brand cb-go">GO</span><span class="card-date">Oct 19</span></div><div class="card-title">Elevar Implementation</div><div class="card-meta">Server-side tracking via Elevar live on Glade Optics</div><div class="card-owner">Mike &middot; <a class="card-link" href="https://app.asana.com/0/1216918298689870/1215976313921293" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+<div class="card" data-brand="ttb" onclick="window.open('https://app.asana.com/0/1216918298689870/1216434575985570','_blank')"><div class="card-top"><span class="card-brand cb-ttb">TTB</span><span class="card-date">Oct 22</span></div><div class="card-title">PDP Update Fit Guides</div><div class="card-meta">Updated fit guide content across Tie Bar PDPs</div><div class="card-owner">Christopher &middot; <a class="card-link" href="https://app.asana.com/0/1216918298689870/1216434575985570" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+<div class="card" data-brand="go" onclick="window.open('https://app.asana.com/0/1216918298689870/1217337068667377','_blank')"><div class="card-top"><span class="card-brand cb-go">GO</span></div><div class="card-title">Hotjar Implementation</div><div class="card-meta">Hotjar live on Glade Optics for heatmaps and session recordings</div><div class="card-owner">Soumi &middot; <a class="card-link" href="https://app.asana.com/0/1216918298689870/1217337068667377" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+</div></div>
+<div class="col" data-col="qa"><div class="col-head"><h2><span class="card-dot cd-orange"></span>In QA <span class="col-count">2</span></h2><p>Built, now in testing.</p></div><div class="col-cards">
+<div class="card" data-brand="ttb" onclick="window.open('https://app.asana.com/0/1216918298689870/1218270042572102','_blank')"><div class="card-top"><span class="card-brand cb-ttb">TTB</span></div><div class="card-title">Holiday Refresh</div><div class="card-meta">Holiday pages redesign for Tie Bar</div><div class="card-owner">Rick &middot; <a class="card-link" href="https://app.asana.com/0/1216918298689870/1218270042572102" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+<div class="card" data-brand="bsc" onclick="window.open('https://app.asana.com/0/1216918298689870/1216055135742179','_blank')"><div class="card-top"><span class="card-brand cb-bsc">BSC</span></div><div class="card-title">Mobile Lifestyle Images</div><div class="card-meta">Lifestyle image swiper on mobile product cards</div><div class="card-owner">Rick &middot; <a class="card-link" href="https://app.asana.com/0/1216918298689870/1216055135742179" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+</div></div>
+<div class="col" data-col="dev"><div class="col-head"><h2><span class="card-dot cd-yellow"></span>In Dev <span class="col-count">5</span></h2><p>Active builds in progress.</p></div><div class="col-cards">
+<div class="card" data-brand="go" onclick="window.open('https://app.asana.com/0/1216918298689870/1219228027617659','_blank')"><div class="card-top"><span class="card-brand cb-go">GO</span></div><div class="card-title">Snow Page Refresh A/B Test</div><div class="card-meta">Snow collection page refresh with A/B testing</div><div class="card-owner">Rick &middot; <a class="card-link" href="https://app.asana.com/0/1216918298689870/1219228027617659" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+<div class="card" data-brand="bsc" onclick="window.open('https://app.asana.com/0/1216918298689870/1216055135742176','_blank')"><div class="card-top"><span class="card-brand cb-bsc">BSC</span></div><div class="card-title">PLP Color Swatches</div><div class="card-meta">Color swatch selectors on PLP cards</div><div class="card-owner">Rick &middot; <a class="card-link" href="https://app.asana.com/0/1216918298689870/1216055135742176" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+<div class="card" data-brand="bsc" onclick="window.open('https://app.asana.com/0/1216918298689870/1217344069777924','_blank')"><div class="card-top"><span class="card-brand cb-bsc">BSC</span></div><div class="card-title">3 Cap Packs (Bundles)</div><div class="card-meta">Bundle builder for 3-cap combo packs</div><div class="card-owner">Soumi &middot; <a class="card-link" href="https://app.asana.com/0/1216918298689870/1217344069777924" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+<div class="card" data-brand="go" onclick="window.open('https://app.asana.com/0/1216918298689870/1219053324782423','_blank')"><div class="card-top"><span class="card-brand cb-go">GO</span></div><div class="card-title">MagFit Bundle Builder</div><div class="card-meta">Bundle builder for MagFit accessories</div><div class="card-owner">Rick &middot; <a class="card-link" href="https://app.asana.com/0/1216918298689870/1219053324782423" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+<div class="card" data-brand="bsc" onclick="window.open('https://app.asana.com/0/1216918298689870/1218522565598365','_blank')"><div class="card-top"><span class="card-brand cb-bsc">BSC</span></div><div class="card-title">PLP Optimization &amp; Tweaks</div><div class="card-meta">PLP optimization and UI tweaks for Boston Scally</div><div class="card-owner">Trajce &middot; <a class="card-link" href="https://app.asana.com/0/1216918298689870/1218522565598365" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+</div></div>
+<div class="col" data-col="design"><div class="col-head"><h2><span class="card-dot cd-purple"></span>In Design <span class="col-count">4</span></h2><p>Active design work this cycle.</p></div><div class="col-cards">
+<div class="card" data-brand="ts" onclick="window.open('https://app.asana.com/0/1216918298689870/1217256951989856','_blank')"><div class="card-top"><span class="card-brand cb-ts">TS</span></div><div class="card-title">PLP Inline Content</div><div class="card-meta">CRO inline content blocks for Taylor Stitch PLPs</div><div class="card-owner">Christopher &middot; <a class="card-link" href="https://app.asana.com/0/1216918298689870/1217256951989856" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+<div class="card" data-brand="pm" onclick="window.open('https://app.asana.com/0/1216918298689870/1217030050177185','_blank')"><div class="card-top"><span class="card-brand cb-pm">PM</span></div><div class="card-title">PLP Redesign (Design)</div><div class="card-meta">Full PLP redesign — design closes end of cycle</div><div class="card-owner">Christopher &middot; <a class="card-link" href="https://app.asana.com/0/1216918298689870/1217030050177185" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+<div class="card" data-brand="ttb" onclick="window.open('https://app.asana.com/0/1216918298689870/1214141640107315','_blank')"><div class="card-top"><span class="card-brand cb-ttb">TTB</span></div><div class="card-title">PDP Cross-Sell for Ties</div><div class="card-meta">Optimized cross-sell on tie and bow tie PDPs</div><div class="card-owner">Christopher &middot; <a class="card-link" href="https://app.asana.com/0/1216918298689870/1214141640107315" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+<div class="card" data-brand="go" onclick="window.open('https://app.asana.com/0/1216055135944201/1219110971070329','_blank')"><div class="card-top"><span class="card-brand cb-go">GO</span></div><div class="card-title">Photochromic Reveal Slider</div><div class="card-meta">Interactive lens comparison slider on PDP</div><div class="card-owner">Christopher &middot; <a class="card-link" href="https://app.asana.com/0/1216055135944201/1219110971070329" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+</div></div>
+<div class="col" data-col="new"><div class="col-head"><h2><span class="card-dot cd-red"></span>New Requests <span class="col-count">3</span></h2><p>Intake requests received this cycle.</p></div><div class="col-cards">
+<div class="card" data-brand="ttb" onclick="window.open('https://app.asana.com/0/1212468076195977/1219557915285433','_blank')"><div class="card-top"><span class="card-brand cb-ttb">TTB</span><span class="card-date">Oct 15</span></div><div class="card-title">Holiday Home Page + Top Nav Updates</div><div class="card-meta">Holiday links in nav and homepage refresh for Tie Bar</div><div class="card-owner">Soumi &middot; <a class="card-link" href="https://app.asana.com/0/1212468076195977/1219557915285433" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+<div class="card" data-brand="bsc" onclick="window.open('https://app.asana.com/0/1212468076195977/1216788911426138','_blank')"><div class="card-top"><span class="card-brand cb-bsc">BSC</span><span class="card-date">Shelby</span></div><div class="card-title">Sold-Out: Back in Stock Email Sign-Up</div><div class="card-meta">Add email sign-up for marketing notifications on sold-out pages</div><div class="card-owner">Christopher &middot; <a class="card-link" href="https://app.asana.com/0/1212468076195977/1216788911426138" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+<div class="card" data-brand="bsc" onclick="window.open('https://app.asana.com/0/1212468076195977/1219742572675915','_blank')"><div class="card-top"><span class="card-brand cb-bsc">BSC</span><span class="card-date">Oct 21</span></div><div class="card-title">Coal Cap + 12 Days of Scally GWP</div><div class="card-meta">Gift with purchase integration for Coal cool caps</div><div class="card-owner">Ravi &middot; <a class="card-link" href="https://app.asana.com/0/1212468076195977/1219742572675915" target="_blank" rel="noopener">View in Asana &rarr;</a></div></div>
+</div></div>
+<div class="col" data-col="next"><div class="col-head"><h2>Q4C2 <span class="tag-next">NEXT</span> <span class="col-count">9</span></h2><p>Nov 9 – Dec 19. Key items from the planning board.</p></div><div class="col-cards">
+<div class="pipe-card" data-brand="pm" onclick="window.open('https://app.asana.com/0/1216055135944201/1219661138038115','_blank')"><span class="card-brand cb-pm">PM</span><div class="pipe-title">PLP Redesign — Build</div><div class="pipe-desc">Dev build of the PM PLP redesign &middot; <a class="card-link" href="https://app.asana.com/0/1216055135944201/1219661138038115" target="_blank" rel="noopener">Asana &rarr;</a></div></div>
+<div class="pipe-card" data-brand="pm" onclick="window.open('https://app.asana.com/0/1216055135944201/1219361338834814','_blank')"><span class="card-brand cb-pm">PM</span><div class="pipe-title">Hero Banner A/B Test</div><div class="pipe-desc">Homepage hero refresh and A/B testing &middot; <a class="card-link" href="https://app.asana.com/0/1216055135944201/1219361338834814" target="_blank" rel="noopener">Asana &rarr;</a></div></div>
+<div class="pipe-card" data-brand="ttb" onclick="window.open('https://app.asana.com/0/1216055135944201/1218270042572092','_blank')"><span class="card-brand cb-ttb">TTB</span><div class="pipe-title">About Us Refresh</div><div class="pipe-desc">About Us page redesign &middot; <a class="card-link" href="https://app.asana.com/0/1216055135944201/1218270042572092" target="_blank" rel="noopener">Asana &rarr;</a></div></div>
+<div class="pipe-card" data-brand="ttb" onclick="window.open('https://app.asana.com/0/1216055135944201/1219799253108444','_blank')"><span class="card-brand cb-ttb">TTB</span><div class="pipe-title">Product Page Redesign</div><div class="pipe-desc">PDP refresh — discovery &amp; design &middot; <a class="card-link" href="https://app.asana.com/0/1216055135944201/1219799253108444" target="_blank" rel="noopener">Asana &rarr;</a></div></div>
+<div class="pipe-card" data-brand="ttb" onclick="window.open('https://app.asana.com/0/1216055135944201/1216434223439827','_blank')"><span class="card-brand cb-ttb">TTB</span><div class="pipe-title">Wholesale / Custom Landing</div><div class="pipe-desc">Custom ties page rebuild — discovery / design &middot; <a class="card-link" href="https://app.asana.com/0/1216055135944201/1216434223439827" target="_blank" rel="noopener">Asana &rarr;</a></div></div>
+<div class="pipe-card" data-brand="ttb" onclick="window.open('https://app.asana.com/0/1216055135944201/1215926433505137','_blank')"><span class="card-brand cb-ttb">TTB</span><div class="pipe-title">Cart Upsell v4</div><div class="pipe-desc">Cart cross-sell iteration 4 &middot; <a class="card-link" href="https://app.asana.com/0/1216055135944201/1215926433505137" target="_blank" rel="noopener">Asana &rarr;</a></div></div>
+<div class="pipe-card" data-brand="ts" onclick="window.open('https://app.asana.com/0/1216055135944201/1219257863233995','_blank')"><span class="card-brand cb-ts">TS</span><div class="pipe-title">PDP Buy Stack Follow-Up</div><div class="pipe-desc">OOS, archive, and last-call states for the redesigned buy stack &middot; <a class="card-link" href="https://app.asana.com/0/1216055135944201/1219257863233995" target="_blank" rel="noopener">Asana &rarr;</a></div></div>
+<div class="pipe-card" data-brand="bsc" onclick="window.open('https://app.asana.com/0/1216055135944201/1219520022722035','_blank')"><span class="card-brand cb-bsc">BSC</span><div class="pipe-title">New Arrivals Section Tweaks</div><div class="pipe-desc">Homepage new arrivals section updates &middot; <a class="card-link" href="https://app.asana.com/0/1216055135944201/1219520022722035" target="_blank" rel="noopener">Asana &rarr;</a></div></div>
+<div class="pipe-card" data-brand="bsc" onclick="window.open('https://app.asana.com/0/1216055135944201/1215804691564976','_blank')"><span class="card-brand cb-bsc">BSC</span><div class="pipe-title">PDP Sold-Out Path Forward</div><div class="pipe-desc">Guide customers from sold-out products to available alternatives &middot; <a class="card-link" href="https://app.asana.com/0/1216055135944201/1215804691564976" target="_blank" rel="noopener">Asana &rarr;</a></div></div>
+</div></div>
+</div></div>
+<script>
+(function() {
+  var activeFilters = new Set();
+  var chips = document.querySelectorAll('.filter-chip');
+  var allCards = document.querySelectorAll('.card[data-brand], .pipe-card[data-brand]');
+  var columns = document.querySelectorAll('.col');
+  function applyFilter() {
+    var showAll = activeFilters.size === 0;
+    allCards.forEach(function(card) {
+      if (showAll || activeFilters.has(card.getAttribute('data-brand'))) { card.classList.remove('hidden'); } else { card.classList.add('hidden'); }
+    });
+    columns.forEach(function(col) {
+      var cards = col.querySelectorAll('.card[data-brand], .pipe-card[data-brand]');
+      var visible = 0;
+      cards.forEach(function(c) { if (!c.classList.contains('hidden')) visible++; });
+      col.querySelector('.col-count').textContent = visible;
+      var cardsContainer = col.querySelector('.col-cards');
+      var existingEmpty = cardsContainer.querySelector('.col-empty');
+      if (visible === 0 && cards.length > 0) { if (!existingEmpty) { var empty = document.createElement('div'); empty.className = 'col-empty'; empty.textContent = 'No matching items.'; cardsContainer.appendChild(empty); } } else if (existingEmpty && cards.length > 0) { existingEmpty.remove(); }
+    });
+  }
+  chips.forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var filter = chip.getAttribute('data-filter');
+      if (filter === 'all') { activeFilters.clear(); chips.forEach(function(c) { c.classList.remove('active'); }); chip.classList.add('active'); } else { document.querySelector('.filter-chip[data-filter="all"]').classList.remove('active'); if (activeFilters.has(filter)) { activeFilters.delete(filter); chip.classList.remove('active'); if (activeFilters.size === 0) { document.querySelector('.filter-chip[data-filter="all"]').classList.add('active'); } } else { activeFilters.add(filter); chip.classList.add('active'); } }
+      applyFilter();
+    });
+  });
+})();
+</script>
+</body>
+</html>
